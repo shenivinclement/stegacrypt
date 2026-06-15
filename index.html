@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StegaCrypt - Encrypted Steganography System</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-card">
+        <!-- Header -->
+        <header class="app-header">
+            <h1>StegaCrypt 🔒</h1>
+            <p class="subtitle">Steganography-Based Encrypted Data Transmission System</p>
+        </header>
+
+        <!-- Tab Controls -->
+        <nav class="tab-nav">
+            <button class="tab-btn active" id="tab-btn-hide" data-tab="tab-hide">🔐 Hide Message</button>
+            <button class="tab-btn" id="tab-btn-reveal" data-tab="tab-reveal">🔍 Reveal Message</button>
+            <div class="tab-slider"></div>
+        </nav>
+
+        <!-- Main Workspaces -->
+        <main class="app-content">
+            <!-- HIDE MESSAGE TAB -->
+            <section class="tab-panel active" id="tab-hide">
+                <div class="form-group">
+                    <label for="carrier-input">Choose Carrier Image (PNG)</label>
+                    <input type="file" id="carrier-input" accept="image/png">
+                    
+                    <!-- Carrier Image Preview -->
+                    <div class="preview-box" id="carrier-preview-wrapper" style="display: none;">
+                        <img id="carrier-preview" alt="Carrier image preview">
+                        <button class="clear-preview-btn" id="remove-carrier-btn" title="Clear Image">×</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="secret-message">Secret Message</label>
+                    <textarea id="secret-message" placeholder="Type your secret message here..." disabled></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="hide-password">Encryption Passphrase</label>
+                    <input type="password" id="hide-password" placeholder="Enter passphrase for encryption" disabled>
+                </div>
+
+                <button class="action-btn" id="btn-hide-process" disabled>Encrypt & Hide Message</button>
+
+                <!-- Progress/Status Area -->
+                <div class="progress-container" id="hide-progress-steps" style="display: none; flex-direction: column; gap: 0.75rem; align-items: center;">
+                    <div id="progress-status-text" style="font-size: 0.9rem; font-weight: 600; color: var(--accent); margin-bottom: 0.25rem; text-align: center;"></div>
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; flex-wrap: wrap;">
+                        <span class="step-badge" id="step-encrypt">Encrypting...</span>
+                        <span class="step-arrow">→</span>
+                        <span class="step-badge" id="step-embed">Embedding...</span>
+                        <span class="step-arrow">→</span>
+                        <span class="step-badge" id="step-done">Done!</span>
+                    </div>
+                </div>
+
+                <!-- Download Area -->
+                <div class="download-container" id="hide-results" style="display: none;">
+                    <p class="success-message">Payload successfully embedded!</p>
+                    <a id="btn-download-stego" class="download-btn" href="#" download="stego_image.png">Download Stego Image</a>
+                </div>
+            </section>
+
+            <!-- REVEAL MESSAGE TAB -->
+            <section class="tab-panel" id="tab-reveal" style="display: none;">
+                <div class="form-group">
+                    <label for="stego-input">Choose Stego Image (PNG)</label>
+                    <input type="file" id="stego-input" accept="image/png">
+                    
+                    <!-- Stego Image Preview -->
+                    <div class="preview-box" id="stego-preview-wrapper" style="display: none;">
+                        <img id="stego-preview" alt="Stego image preview">
+                        <button class="clear-preview-btn" id="remove-stego-btn" title="Clear Image">×</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="reveal-password">Decryption Passphrase</label>
+                    <input type="password" id="reveal-password" placeholder="Enter passphrase for decryption" disabled>
+                </div>
+
+                <button class="action-btn" id="btn-reveal-process" disabled>Extract & Decrypt Message</button>
+
+                <!-- Error Box -->
+                <div class="error-box" id="reveal-error-box" style="display: none;"></div>
+
+                <!-- Result Box -->
+                <div class="result-container" id="reveal-results" style="display: none;">
+                    <label for="decrypted-message">Revealed Message</label>
+                    <textarea id="decrypted-message" class="monospace-output" readonly></textarea>
+                    <button class="copy-btn" id="btn-copy-message">Copy Message</button>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <p>College Project | Cryptography | Steganography</p>
+        </footer>
+    </div>
+
+    <!-- Main Controller module -->
+    <script type="module" src="app.js"></script>
+</body>
+</html>

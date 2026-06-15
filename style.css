@@ -1,0 +1,486 @@
+/* ==========================================================================
+   StegaCrypt Theme & Styling Reset
+   ========================================================================== */
+:root {
+    --bg-color: #0f0f1a;
+    --card-bg: #1a1a2e;
+    --accent: #7c3aed;
+    --accent-hover: #9061f9;
+    --accent-glow: rgba(124, 58, 237, 0.35);
+    
+    --text-white: #ffffff;
+    --text-muted: #94a3b8;
+    --text-disabled: #475569;
+    --border-color: rgba(255, 255, 255, 0.08);
+    
+    --success: #10b981;
+    --success-bg: rgba(16, 185, 129, 0.1);
+    --success-border: rgba(16, 185, 129, 0.3);
+    
+    --error: #ef4444;
+    --error-bg: rgba(239, 68, 68, 0.1);
+    --error-border: rgba(239, 68, 68, 0.3);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-white);
+    font-family: 'Outfit', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1.5rem;
+    overflow-y: auto;
+}
+
+/* ==========================================================================
+   Card Layout
+   ========================================================================== */
+.app-card {
+    background-color: var(--card-bg);
+    width: 100%;
+    max-width: 700px;
+    border-radius: 16px;
+    padding: 2.25rem;
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(124, 58, 237, 0.15);
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+    animation: scaleUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes scaleUp {
+    from { transform: scale(0.97); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+/* ==========================================================================
+   Header
+   ========================================================================== */
+.app-header {
+    text-align: center;
+}
+
+.app-header h1 {
+    font-size: 2.25rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    margin-bottom: 0.35rem;
+}
+
+.subtitle {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    font-weight: 400;
+}
+
+/* ==========================================================================
+   Tab Navigation & Toggle Underline
+   ========================================================================== */
+.tab-nav {
+    display: flex;
+    background: rgba(15, 15, 26, 0.5);
+    border: 1px solid var(--border-color);
+    padding: 0.25rem;
+    border-radius: 10px;
+    position: relative;
+    gap: 0.25rem;
+}
+
+.tab-btn {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text-muted);
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 600;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: color 0.2s ease, background-color 0.2s ease;
+    z-index: 2;
+}
+
+.tab-btn:hover {
+    color: var(--text-white);
+}
+
+.tab-btn.active {
+    color: var(--text-white);
+    background-color: var(--accent);
+    box-shadow: 0 4px 12px var(--accent-glow);
+}
+
+/* ==========================================================================
+   Forms & Groups
+   ========================================================================== */
+.tab-panel {
+    display: none;
+    flex-direction: column;
+    gap: 1.5rem;
+    animation: fadeIn 0.35s ease forwards;
+}
+
+.tab-panel.active {
+    display: flex;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-group label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--text-muted);
+}
+
+/* Inputs & Textareas */
+input[type="file"] {
+    background: rgba(15, 15, 26, 0.4);
+    border: 1px solid var(--border-color);
+    color: var(--text-muted);
+    padding: 0.65rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+
+input[type="file"]::file-selector-button {
+    background: var(--accent);
+    color: var(--text-white);
+    border: none;
+    border-radius: 6px;
+    padding: 0.35rem 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-right: 0.75rem;
+    transition: background-color 0.2s ease;
+}
+
+input[type="file"]::file-selector-button:hover {
+    background-color: var(--accent-hover);
+}
+
+input[type="password"], textarea {
+    background: rgba(15, 15, 26, 0.6);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-white);
+    padding: 0.8rem 1rem;
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+input[type="password"]:focus, textarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+input:disabled, textarea:disabled {
+    background: rgba(15, 15, 26, 0.15);
+    border-color: rgba(255, 255, 255, 0.02);
+    color: var(--text-disabled);
+    cursor: not-allowed;
+}
+
+/* ==========================================================================
+   Image Preview Box
+   ========================================================================== */
+.preview-box {
+    margin-top: 0.5rem;
+    width: 100%;
+    max-height: 200px;
+    border-radius: 8px;
+    background: #0b0b13;
+    border: 1px dashed rgba(124, 58, 237, 0.25);
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0.5rem;
+    overflow: hidden;
+}
+
+.preview-box img {
+    max-height: 180px;
+    max-width: 100%;
+    object-fit: contain;
+}
+
+.clear-preview-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: rgba(239, 68, 68, 0.9);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 26px;
+    height: 26px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background-color 0.2s ease;
+}
+
+.clear-preview-btn:hover {
+    background: var(--error);
+}
+
+/* ==========================================================================
+   Action Buttons
+   ========================================================================== */
+.action-btn {
+    background-color: var(--accent);
+    color: var(--text-white);
+    border: none;
+    border-radius: 8px;
+    padding: 0.9rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.1s ease;
+    box-shadow: 0 4px 15px rgba(124, 58, 237, 0.2);
+}
+
+.action-btn:hover:not(:disabled) {
+    background-color: var(--accent-hover);
+    box-shadow: 0 6px 20px rgba(124, 58, 237, 0.35);
+}
+
+.action-btn:active:not(:disabled) {
+    transform: translateY(1px);
+}
+
+.action-btn:disabled {
+    background-color: var(--text-disabled);
+    color: var(--text-muted);
+    box-shadow: none;
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+/* ==========================================================================
+   Progress Indicators
+   ========================================================================== */
+.progress-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(15, 15, 26, 0.4);
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    margin-top: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.step-badge {
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 0.25rem 0.65rem;
+    border-radius: 4px;
+    color: var(--text-muted);
+    border: 1px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.step-badge.active {
+    color: var(--text-white);
+    background-color: rgba(124, 58, 237, 0.2);
+    border-color: var(--accent);
+    box-shadow: 0 0 8px rgba(124, 58, 237, 0.15);
+}
+
+.step-badge.complete {
+    color: var(--success);
+    background-color: rgba(16, 185, 129, 0.1);
+    border-color: var(--success);
+}
+
+.step-arrow {
+    color: var(--text-disabled);
+    font-weight: 700;
+}
+
+/* ==========================================================================
+   Download Container & Buttons
+   ========================================================================== */
+.download-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1.25rem;
+    background: var(--success-bg);
+    border: 1px solid var(--success-border);
+    border-radius: 10px;
+    animation: fadeIn 0.4s ease forwards;
+}
+
+.success-message {
+    font-weight: 600;
+    color: var(--success);
+    font-size: 0.95rem;
+}
+
+.download-btn {
+    display: inline-block;
+    background-color: var(--success);
+    color: white;
+    text-decoration: none;
+    font-weight: 700;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+    font-size: 0.95rem;
+}
+
+.download-btn:hover {
+    background-color: #059669;
+    box-shadow: 0 6px 16px rgba(16, 185, 129, 0.35);
+}
+
+/* ==========================================================================
+   Decrypted Results Box (Monospace)
+   ========================================================================== */
+.result-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+    animation: fadeIn 0.4s ease forwards;
+}
+
+.result-container label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--text-muted);
+}
+
+.monospace-output {
+    font-family: 'JetBrains Mono', Courier, monospace;
+    font-size: 0.95rem;
+    color: var(--success);
+    background: rgba(16, 185, 129, 0.03);
+    border-color: rgba(16, 185, 129, 0.2);
+    min-height: 120px;
+}
+
+.monospace-output:focus {
+    border-color: var(--success);
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+}
+
+.copy-btn {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-white);
+    border-radius: 8px;
+    padding: 0.65rem 1.25rem;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+    width: fit-content;
+    align-self: flex-end;
+}
+
+.copy-btn:hover {
+    border-color: var(--accent);
+    background-color: rgba(124, 58, 237, 0.05);
+}
+
+/* ==========================================================================
+   Error/Warning Display
+   ========================================================================== */
+.error-box {
+    background-color: var(--error-bg);
+    border: 1px solid var(--error-border);
+    color: var(--error);
+    font-size: 0.9rem;
+    padding: 0.85rem 1.15rem;
+    border-radius: 8px;
+    margin-top: 0.5rem;
+    line-height: 1.4;
+    animation: shake 0.35s ease-in-out;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    75% { transform: translateX(4px); }
+}
+
+/* ==========================================================================
+   Footer
+   ========================================================================== */
+.app-footer {
+    text-align: center;
+    border-top: 1px solid var(--border-color);
+    padding-top: 1.25rem;
+    margin-top: 0.5rem;
+}
+
+.app-footer p {
+    color: var(--text-disabled);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+}
+
+/* ==========================================================================
+   Responsive Utilities
+   ========================================================================== */
+@media (max-width: 580px) {
+    .app-card {
+        padding: 1.5rem;
+        gap: 1.25rem;
+    }
+    
+    .app-header h1 {
+        font-size: 1.75rem;
+    }
+    
+    .tab-btn {
+        padding: 0.6rem 0.75rem;
+        font-size: 0.85rem;
+    }
+}
