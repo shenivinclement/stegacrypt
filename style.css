@@ -484,3 +484,101 @@ input:disabled, textarea:disabled {
         font-size: 0.85rem;
     }
 }
+
+/* ==========================================================================
+   Steganalysis & Visual Analysis Tab
+   ========================================================================== */
+.collapsible-card {
+    background: rgba(15, 15, 26, 0.4);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    margin-bottom: 1rem;
+    overflow: hidden;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.collapsible-card[open] {
+    border-color: var(--accent);
+    box-shadow: 0 4px 15px rgba(124, 58, 237, 0.08);
+}
+
+.collapsible-card summary {
+    list-style: none;
+    outline: none;
+    cursor: pointer;
+    padding: 1rem 1.25rem;
+    font-weight: 600;
+    font-size: 1.05rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    user-select: none;
+    background: rgba(255, 255, 255, 0.02);
+    transition: background-color 0.2s ease;
+}
+
+.collapsible-card summary::-webkit-details-marker {
+    display: none;
+}
+
+.collapsible-card summary:hover {
+    background: rgba(124, 58, 237, 0.05);
+}
+
+.collapsible-card .toggle-icon {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    transition: transform 0.3s ease;
+}
+
+.collapsible-card[open] .toggle-icon {
+    transform: rotate(180deg);
+}
+
+.card-content {
+    padding: 1.25rem;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    animation: slideDown 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+@media (max-width: 580px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.spinner {
+    width: 24px;
+    height: 24px;
+    border: 3px solid rgba(124, 58, 237, 0.15);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Ensure canvas elements fit properly in dark background wrappers */
+#tab-analyze canvas {
+    display: block;
+    max-width: 100%;
+    background-color: #0b0b13;
+    image-rendering: pixelated; /* Keep pixel-level details crisp and unblurred */
+}
+

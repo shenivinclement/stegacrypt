@@ -22,6 +22,7 @@
         <nav class="tab-nav">
             <button class="tab-btn active" id="tab-btn-hide" data-tab="tab-hide">🔐 Hide Message</button>
             <button class="tab-btn" id="tab-btn-reveal" data-tab="tab-reveal">🔍 Reveal Message</button>
+            <button class="tab-btn" id="tab-btn-analyze" data-tab="tab-analyze">🔬 Analyze Image</button>
             <div class="tab-slider"></div>
         </nav>
 
@@ -100,6 +101,120 @@
                     <textarea id="decrypted-message" class="monospace-output" readonly></textarea>
                     <button class="copy-btn" id="btn-copy-message">Copy Message</button>
                 </div>
+            </section>
+
+            <!-- ANALYZE IMAGE TAB -->
+            <section class="tab-panel" id="tab-analyze" style="display: none;">
+                <!-- Loading Overlay/Spinner -->
+                <div class="progress-container" id="analyze-loading" style="display: none; flex-direction: column; gap: 0.75rem; align-items: center; margin-bottom: 1rem; width: 100%;">
+                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                        <div class="spinner"></div>
+                        <span id="analyze-loading-text" style="font-size: 0.95rem; font-weight: 600; color: var(--accent);">Processing image...</span>
+                    </div>
+                </div>
+
+                <!-- CARD 1: Capacity Calculator -->
+                <details class="collapsible-card" open>
+                    <summary>
+                        <span>📐 Capacity Calculator</span>
+                        <span class="toggle-icon">▼</span>
+                    </summary>
+                    <div class="card-content">
+                        <div class="form-group">
+                            <label for="analyze-capacity-input">Upload any PNG image</label>
+                            <input type="file" id="analyze-capacity-input" accept="image/png">
+                        </div>
+                        <button class="action-btn" id="btn-analyze-capacity" disabled>Calculate Capacity</button>
+                        <div class="result-container" id="analyze-capacity-result" style="display: none; width: 100%;">
+                            <div class="stats-box" style="padding: 1rem; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-color); border-radius: 8px; width: 100%;">
+                                <p style="font-size: 0.95rem; line-height: 1.6; color: var(--text-white);" id="analyze-capacity-text"></p>
+                            </div>
+                        </div>
+                    </div>
+                </details>
+
+                <!-- CARD 2: LSB Plane Visualizer -->
+                <details class="collapsible-card">
+                    <summary>
+                        <span>🔬 LSB Plane Visualizer</span>
+                        <span class="toggle-icon">▼</span>
+                    </summary>
+                    <div class="card-content">
+                        <div class="form-group">
+                            <label for="analyze-lsb-input">Upload a PNG image (original or stego)</label>
+                            <input type="file" id="analyze-lsb-input" accept="image/png">
+                        </div>
+                        <button class="action-btn" id="btn-analyze-lsb" disabled>Visualize LSB Plane</button>
+                        <div class="result-container" id="analyze-lsb-result" style="display: none; flex-direction: column; align-items: center; width: 100%;">
+                            <div style="width: 100%; border: 1px solid var(--border-color); border-radius: 8px; padding: 0.5rem; background: #0b0b13; overflow: hidden; display: flex; justify-content: center; align-items: center;">
+                                <canvas id="analyze-lsb-canvas" style="max-width: 100%; max-height: 350px; height: auto; object-fit: contain;"></canvas>
+                            </div>
+                            <div style="font-size: 0.85rem; font-weight: 600; text-transform: uppercase; color: var(--text-muted); margin-top: 0.5rem; text-align: center;">
+                                LSB Plane — structured region = hidden data present
+                            </div>
+                            <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; text-align: left; margin-top: 0.5rem; width: 100%;">
+                                This visualization highlights the least significant bits of the image. Structured, non-random patterns (like horizontal bands or text-like blocks) near the top-left indicate the presence of hidden steganographic data.
+                            </p>
+                        </div>
+                    </div>
+                </details>
+
+                <!-- CARD 3: Pixel Difference Heatmap -->
+                <details class="collapsible-card">
+                    <summary>
+                        <span>🌡️ Pixel Difference Heatmap</span>
+                        <span class="toggle-icon">▼</span>
+                    </summary>
+                    <div class="card-content">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="analyze-diff-orig-input">Upload Original Image</label>
+                                <input type="file" id="analyze-diff-orig-input" accept="image/png">
+                            </div>
+                            <div class="form-group">
+                                <label for="analyze-diff-stego-input">Upload Stego Image</label>
+                                <input type="file" id="analyze-diff-stego-input" accept="image/png">
+                            </div>
+                        </div>
+                        <button class="action-btn" id="btn-analyze-diff" disabled>Generate Heatmap</button>
+                        <div class="result-container" id="analyze-diff-result" style="display: none; flex-direction: column; align-items: center; width: 100%;">
+                            <div style="width: 100%; border: 1px solid var(--border-color); border-radius: 8px; padding: 0.5rem; background: #0b0b13; overflow: hidden; display: flex; justify-content: center; align-items: center;">
+                                <canvas id="analyze-diff-canvas" style="max-width: 100%; max-height: 350px; height: auto; object-fit: contain;"></canvas>
+                            </div>
+                            <div class="stats-box" style="width: 100%; padding: 1rem; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-color); border-radius: 8px; text-align: left;">
+                                <p style="font-size: 0.95rem; font-weight: 600; color: var(--accent); margin-bottom: 0.5rem;" id="analyze-diff-stats"></p>
+                                <p style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.5;">
+                                    <strong>Note:</strong> Red pixels = bits modified by LSB steganography. The change is invisible to the human eye but detectable by pixel comparison.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </details>
+
+                <!-- CARD 4: Histogram Analysis -->
+                <details class="collapsible-card">
+                    <summary>
+                        <span>📊 Histogram Analysis</span>
+                        <span class="toggle-icon">▼</span>
+                    </summary>
+                    <div class="card-content">
+                        <div class="form-group">
+                            <label for="analyze-hist-input">Upload a PNG image</label>
+                            <input type="file" id="analyze-hist-input" accept="image/png">
+                        </div>
+                        <button class="action-btn" id="btn-analyze-hist" disabled>Analyze Histogram</button>
+                        <div class="result-container" id="analyze-hist-result" style="display: none; flex-direction: column; align-items: center; width: 100%;">
+                            <div style="width: 100%; border: 1px solid var(--border-color); border-radius: 8px; padding: 0.5rem; background: #0b0b13; overflow: hidden; display: flex; justify-content: center; align-items: center;">
+                                <canvas id="analyze-hist-canvas" width="600" height="300" style="max-width: 100%; height: auto; object-fit: contain;"></canvas>
+                            </div>
+                            <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; text-align: left; margin-top: 0.5rem; width: 100%;">
+                                LSB steganography shifts even-valued pixels to odd and vice versa. 
+                                In a stego image, histogram bars at adjacent even/odd values become 
+                                more equal in height — this is the statistical fingerprint of LSB embedding.
+                            </p>
+                        </div>
+                    </div>
+                </details>
             </section>
         </main>
 

@@ -7,12 +7,20 @@
 
 import { encryptMessage, decryptMessage } from './crypto.js';
 import { hideDataInImage, extractDataFromImage } from './steganography.js';
+import {
+    imageCapacityCalculator,
+    lsbPlaneVisualizer,
+    pixelDifferenceHeatmap,
+    histogramAnalysis
+} from './analyzer.js';
 
 // DOM Element References
 const tabBtnHide = document.getElementById('tab-btn-hide');
 const tabBtnReveal = document.getElementById('tab-btn-reveal');
+const tabBtnAnalyze = document.getElementById('tab-btn-analyze');
 const tabHide = document.getElementById('tab-hide');
 const tabReveal = document.getElementById('tab-reveal');
+const tabAnalyze = document.getElementById('tab-analyze');
 
 // HIDE MESSAGE TAB SELECTORS
 const carrierInput = document.getElementById('carrier-input');
@@ -53,6 +61,13 @@ let carrierImageLoaded = false;
 let stegoImageFile = null;
 let stegoImageLoaded = false;
 
+// State Variables for Analyze Tab
+let capacityFile = null;
+let lsbFile = null;
+let diffOrigFile = null;
+let diffStegoFile = null;
+let histFile = null;
+
 /* ==========================================================================
    Tab Switching Logic
    ========================================================================== */
@@ -60,18 +75,24 @@ function setupTabs() {
     tabBtnHide.addEventListener('click', () => {
         tabBtnHide.classList.add('active');
         tabBtnReveal.classList.remove('active');
+        tabBtnAnalyze.classList.remove('active');
         tabHide.classList.add('active');
         tabReveal.classList.remove('active');
+        tabAnalyze.classList.remove('active');
         tabReveal.style.display = 'none';
+        tabAnalyze.style.display = 'none';
         tabHide.style.display = 'flex';
     });
 
     tabBtnReveal.addEventListener('click', () => {
         tabBtnReveal.classList.add('active');
         tabBtnHide.classList.remove('active');
+        tabBtnAnalyze.classList.remove('active');
         tabReveal.classList.add('active');
         tabHide.classList.remove('active');
+        tabAnalyze.classList.remove('active');
         tabHide.style.display = 'none';
+        tabAnalyze.style.display = 'none';
         tabReveal.style.display = 'flex';
         
         // Auto-load stego-image from localStorage if available (testing convenience)
@@ -84,6 +105,18 @@ function setupTabs() {
                     handleStegoFile(file);
                 }).catch(err => console.error("Error auto-loading stego image:", err));
         }
+    });
+
+    tabBtnAnalyze.addEventListener('click', () => {
+        tabBtnAnalyze.classList.add('active');
+        tabBtnHide.classList.remove('active');
+        tabBtnReveal.classList.remove('active');
+        tabAnalyze.classList.add('active');
+        tabHide.classList.remove('active');
+        tabReveal.classList.remove('active');
+        tabHide.style.display = 'none';
+        tabReveal.style.display = 'none';
+        tabAnalyze.style.display = 'flex';
     });
 }
 
@@ -402,6 +435,163 @@ function copyToClipboard() {
 }
 
 /* ==========================================================================
+   Tab 3: Steganalysis & Visual Analysis Implementation
+   ========================================================================== */
+
+// DOM Selectors for Tab 3
+const analyzeLoading = document.getElementById('analyze-loading');
+const analyzeLoadingText = document.getElementById('analyze-loading-text');
+
+// Card 1 Selectors
+const capacityInput = document.getElementById('analyze-capacity-input');
+const btnAnalyzeCapacity = document.getElementById('btn-analyze-capacity');
+const capacityResult = document.getElementById('analyze-capacity-result');
+const capacityText = document.getElementById('analyze-capacity-text');
+
+// Card 2 Selectors
+const lsbInput = document.getElementById('analyze-lsb-input');
+const btnAnalyzeLsb = document.getElementById('btn-analyze-lsb');
+const lsbResult = document.getElementById('analyze-lsb-result');
+const lsbCanvas = document.getElementById('analyze-lsb-canvas');
+
+// Card 3 Selectors
+const diffOrigInput = document.getElementById('analyze-diff-orig-input');
+const diffStegoInput = document.getElementById('analyze-diff-stego-input');
+const btnAnalyzeDiff = document.getElementById('btn-analyze-diff');
+const diffResult = document.getElementById('analyze-diff-result');
+const diffCanvas = document.getElementById('analyze-diff-canvas');
+const diffStats = document.getElementById('analyze-diff-stats');
+
+// Card 4 Selectors
+const histInput = document.getElementById('analyze-hist-input');
+const btnAnalyzeHist = document.getElementById('btn-analyze-hist');
+const histResult = document.getElementById('analyze-hist-result');
+const histCanvas = document.getElementById('analyze-hist-canvas');
+
+function showAnalyzeLoading(message) {
+    if (analyzeLoadingText && analyzeLoading) {
+        analyzeLoadingText.textContent = message;
+        analyzeLoading.style.display = 'flex';
+    }
+}
+
+function hideAnalyzeLoading() {
+    if (analyzeLoading) {
+        analyzeLoading.style.display = 'none';
+    }
+}
+
+async function runCapacityCalculator() {
+    if (!capacityFile) return;
+    
+    showAnalyzeLoading("Calculating capacity...");
+    capacityResult.style.display = 'none';
+    btnAnalyzeCapacity.disabled = true;
+    
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
+    try {
+        const stats = await imageCapacityCalculator(capacityFile);
+        const kbSize = (stats.maxBytes / 1024).toFixed(2);
+        
+        capacityText.innerHTML = `
+            <strong>Dimensions:</strong> ${stats.width} × ${stats.height} px<br>
+            <strong>Total Pixels:</strong> ${stats.totalPixels.toLocaleString()}<br>
+            <strong>Max Payload:</strong> This image can hide up to <strong>${stats.maxCharacters.toLocaleString()}</strong> characters (<strong>${kbSize} KB</strong>) of encrypted data.
+        `;
+        capacityResult.style.display = 'flex';
+        showToast("Capacity calculated successfully.", "success");
+        
+        capacityResult.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    } catch (err) {
+        console.error(err);
+        showToast(err.message || "Failed to calculate capacity.", "error");
+    } finally {
+        hideAnalyzeLoading();
+        btnAnalyzeCapacity.disabled = false;
+    }
+}
+
+async function runLsbVisualizer() {
+    if (!lsbFile) return;
+    
+    showAnalyzeLoading("Analyzing LSB plane (may take a moment for large images)...");
+    lsbResult.style.display = 'none';
+    btnAnalyzeLsb.disabled = true;
+    
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
+    try {
+        await lsbPlaneVisualizer(lsbFile, lsbCanvas);
+        
+        lsbResult.style.display = 'flex';
+        showToast("LSB plane visualized successfully.", "success");
+        
+        lsbResult.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    } catch (err) {
+        console.error(err);
+        showToast(err.message || "Failed to visualize LSB plane.", "error");
+    } finally {
+        hideAnalyzeLoading();
+        btnAnalyzeLsb.disabled = false;
+    }
+}
+
+async function runDiffHeatmap() {
+    if (!diffOrigFile || !diffStegoFile) return;
+    
+    showAnalyzeLoading("Generating pixel difference heatmap...");
+    diffResult.style.display = 'none';
+    btnAnalyzeDiff.disabled = true;
+    
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
+    try {
+        const stats = await pixelDifferenceHeatmap(diffOrigFile, diffStegoFile, diffCanvas);
+        
+        diffStats.innerHTML = `
+            <strong>Modified Pixels:</strong> ${stats.modifiedPixels.toLocaleString()} out of ${stats.totalPixels.toLocaleString()} total pixels (${stats.percentage}%)
+        `;
+        
+        diffResult.style.display = 'flex';
+        showToast("Difference heatmap generated successfully.", "success");
+        
+        diffResult.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    } catch (err) {
+        console.error(err);
+        showToast(err.message || "Failed to generate heatmap. Check image dimensions.", "error");
+    } finally {
+        hideAnalyzeLoading();
+        btnAnalyzeDiff.disabled = false;
+    }
+}
+
+async function runHistogram() {
+    if (!histFile) return;
+    
+    showAnalyzeLoading("Analyzing brightness histogram...");
+    histResult.style.display = 'none';
+    btnAnalyzeHist.disabled = true;
+    
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
+    try {
+        await histogramAnalysis(histFile, histCanvas);
+        
+        histResult.style.display = 'flex';
+        showToast("Histogram analysis completed.", "success");
+        
+        histResult.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    } catch (err) {
+        console.error(err);
+        showToast(err.message || "Failed to analyze histogram.", "error");
+    } finally {
+        hideAnalyzeLoading();
+        btnAnalyzeHist.disabled = false;
+    }
+}
+
+/* ==========================================================================
    Initialization & Event Listeners
    ========================================================================== */
 document.addEventListener('DOMContentLoaded', () => {
@@ -425,6 +615,64 @@ document.addEventListener('DOMContentLoaded', () => {
     revealPasswordEl.addEventListener('input', validateRevealInputs);
     btnRevealProcess.addEventListener('click', processRevealMessage);
     btnCopyMessage.addEventListener('click', copyToClipboard);
+
+    // 4. Tab 3 (Analyze) Bindings
+    capacityInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) {
+            capacityFile = e.target.files[0];
+            btnAnalyzeCapacity.disabled = false;
+        } else {
+            capacityFile = null;
+            btnAnalyzeCapacity.disabled = true;
+        }
+    });
+
+    lsbInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) {
+            lsbFile = e.target.files[0];
+            btnAnalyzeLsb.disabled = false;
+        } else {
+            lsbFile = null;
+            btnAnalyzeLsb.disabled = true;
+        }
+    });
+
+    const validateDiffInputs = () => {
+        btnAnalyzeDiff.disabled = !diffOrigFile || !diffStegoFile;
+    };
+    
+    diffOrigInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) {
+            diffOrigFile = e.target.files[0];
+        } else {
+            diffOrigFile = null;
+        }
+        validateDiffInputs();
+    });
+    
+    diffStegoInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) {
+            diffStegoFile = e.target.files[0];
+        } else {
+            diffStegoFile = null;
+        }
+        validateDiffInputs();
+    });
+
+    histInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) {
+            histFile = e.target.files[0];
+            btnAnalyzeHist.disabled = false;
+        } else {
+            histFile = null;
+            btnAnalyzeHist.disabled = true;
+        }
+    });
+
+    btnAnalyzeCapacity.addEventListener('click', runCapacityCalculator);
+    btnAnalyzeLsb.addEventListener('click', runLsbVisualizer);
+    btnAnalyzeDiff.addEventListener('click', runDiffHeatmap);
+    btnAnalyzeHist.addEventListener('click', runHistogram);
 
     // Auto-load sample carrier image for testing if running on web server
     setTimeout(() => {
