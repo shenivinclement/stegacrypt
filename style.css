@@ -1,25 +1,16 @@
 /* ==========================================================================
-   StegaCrypt Theme & Styling Reset
+   StegaCrypt Theme & Styling Design System
    ========================================================================== */
 :root {
-    --bg-color: #0f0f1a;
+    --bg: #0f0f1a;
     --card-bg: #1a1a2e;
     --accent: #7c3aed;
-    --accent-hover: #9061f9;
-    --accent-glow: rgba(124, 58, 237, 0.35);
-    
-    --text-white: #ffffff;
-    --text-muted: #94a3b8;
-    --text-disabled: #475569;
-    --border-color: rgba(255, 255, 255, 0.08);
-    
-    --success: #10b981;
-    --success-bg: rgba(16, 185, 129, 0.1);
-    --success-border: rgba(16, 185, 129, 0.3);
-    
+    --accent2: #a855f7;
+    --text: #f1f1f1;
+    --subtext: #9ca3af;
     --error: #ef4444;
-    --error-bg: rgba(239, 68, 68, 0.1);
-    --error-border: rgba(239, 68, 68, 0.3);
+    --success: #22c55e;
+    --border: #2d2d4e;
 }
 
 * {
@@ -29,138 +20,124 @@
 }
 
 body {
-    background-color: var(--bg-color);
-    color: var(--text-white);
-    font-family: 'Outfit', sans-serif;
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    font-size: 0.9rem;
     min-height: 100vh;
     display: flex;
     justify-content: center;
-    align-items: center;
-    padding: 1.5rem;
-    overflow-y: auto;
+    align-items: flex-start;
+    padding: 2rem 1rem;
 }
 
-/* ==========================================================================
-   Card Layout
-   ========================================================================== */
-.app-card {
-    background-color: var(--card-bg);
+/* Container Layout */
+.app-container {
     width: 100%;
-    max-width: 700px;
-    border-radius: 16px;
-    padding: 2.25rem;
-    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.5);
-    border: 1px solid rgba(124, 58, 237, 0.15);
+    max-width: 720px;
+    margin: 0 auto;
     display: flex;
     flex-direction: column;
-    gap: 1.75rem;
-    animation: scaleUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    gap: 16px;
 }
 
-@keyframes scaleUp {
-    from { transform: scale(0.97); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
-}
-
-/* ==========================================================================
-   Header
-   ========================================================================== */
+/* Header */
 .app-header {
     text-align: center;
+    margin-bottom: 8px;
 }
 
 .app-header h1 {
-    font-size: 2.25rem;
-    font-weight: 800;
-    letter-spacing: -0.5px;
-    margin-bottom: 0.35rem;
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 6px;
 }
 
 .subtitle {
-    color: var(--text-muted);
+    color: var(--subtext);
     font-size: 0.95rem;
-    font-weight: 400;
 }
 
-/* ==========================================================================
-   Tab Navigation & Toggle Underline
-   ========================================================================== */
+/* Tabs Navigation */
 .tab-nav {
     display: flex;
-    background: rgba(15, 15, 26, 0.5);
-    border: 1px solid var(--border-color);
-    padding: 0.25rem;
-    border-radius: 10px;
-    position: relative;
-    gap: 0.25rem;
+    flex-direction: row;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 8px;
 }
 
 .tab-btn {
     flex: 1;
     background: transparent;
     border: none;
-    outline: none;
-    color: var(--text-muted);
-    font-family: inherit;
+    border-bottom: 3px solid transparent;
+    color: var(--subtext);
+    font-family: 'Segoe UI', sans-serif;
     font-size: 0.95rem;
     font-weight: 600;
-    padding: 0.75rem 1rem;
-    border-radius: 8px;
+    padding: 12px 16px;
     cursor: pointer;
-    transition: color 0.2s ease, background-color 0.2s ease;
-    z-index: 2;
+    text-align: center;
+    transition: all 0.2s ease;
 }
 
 .tab-btn:hover {
-    color: var(--text-white);
+    color: var(--text);
 }
 
 .tab-btn.active {
-    color: var(--text-white);
-    background-color: var(--accent);
-    box-shadow: 0 4px 12px var(--accent-glow);
+    border-bottom: 3px solid var(--accent);
+    color: var(--accent);
 }
 
-/* ==========================================================================
-   Forms & Groups
-   ========================================================================== */
+/* Content Panels */
 .tab-panel {
     display: none;
-    flex-direction: column;
-    gap: 1.5rem;
-    animation: fadeIn 0.35s ease forwards;
+    animation: fadeIn 0.3s ease-in-out forwards;
 }
 
 .tab-panel.active {
-    display: flex;
+    display: block;
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(4px); }
+    from { opacity: 0; transform: translateY(5px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
+/* Card Styling */
+.card {
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    padding: 24px;
+    border: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* Form controls */
 .form-group {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 8px;
 }
 
 .form-group label {
     font-size: 0.85rem;
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.8px;
-    color: var(--text-muted);
+    letter-spacing: 0.5px;
+    color: var(--subtext);
 }
 
-/* Inputs & Textareas */
+/* Inputs, Textareas, Password fields */
 input[type="file"] {
-    background: rgba(15, 15, 26, 0.4);
-    border: 1px solid var(--border-color);
-    color: var(--text-muted);
-    padding: 0.65rem 1rem;
+    background-color: #0f0f1a;
+    border: 1px solid var(--border);
     border-radius: 8px;
+    color: var(--text);
+    padding: 10px 14px;
     cursor: pointer;
     font-size: 0.9rem;
     outline: none;
@@ -168,30 +145,31 @@ input[type="file"] {
 }
 
 input[type="file"]::file-selector-button {
-    background: var(--accent);
-    color: var(--text-white);
+    background-color: var(--accent);
+    color: white;
     border: none;
     border-radius: 6px;
-    padding: 0.35rem 0.75rem;
+    padding: 4px 12px;
     font-weight: 600;
     cursor: pointer;
-    margin-right: 0.75rem;
+    margin-right: 12px;
     transition: background-color 0.2s ease;
 }
 
 input[type="file"]::file-selector-button:hover {
-    background-color: var(--accent-hover);
+    background-color: var(--accent2);
 }
 
 input[type="password"], textarea {
-    background: rgba(15, 15, 26, 0.6);
-    border: 1px solid var(--border-color);
+    background-color: #0f0f1a;
+    border: 1px solid var(--border);
     border-radius: 8px;
-    color: var(--text-white);
-    padding: 0.8rem 1rem;
+    color: white;
+    padding: 10px 14px;
     font-size: 0.95rem;
+    font-family: inherit;
     outline: none;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    transition: border-color 0.2s ease;
 }
 
 textarea {
@@ -199,322 +177,175 @@ textarea {
     resize: vertical;
 }
 
-input[type="password"]:focus, textarea:focus {
+input[type="password"]:focus, textarea:focus, input[type="file"]:focus {
     border-color: var(--accent);
-    box-shadow: 0 0 0 3px var(--accent-glow);
 }
 
-input:disabled, textarea:disabled {
-    background: rgba(15, 15, 26, 0.15);
-    border-color: rgba(255, 255, 255, 0.02);
-    color: var(--text-disabled);
-    cursor: not-allowed;
-}
-
-/* ==========================================================================
-   Image Preview Box
-   ========================================================================== */
-.preview-box {
-    margin-top: 0.5rem;
-    width: 100%;
-    max-height: 200px;
+/* Buttons */
+.action-btn {
+    background-color: var(--accent);
+    color: white;
+    border: none;
     border-radius: 8px;
-    background: #0b0b13;
-    border: 1px dashed rgba(124, 58, 237, 0.25);
-    position: relative;
+    padding: 12px 24px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+}
+
+.action-btn:hover:not(:disabled) {
+    background-color: var(--accent2);
+    transform: translateY(-1px);
+}
+
+.action-btn:disabled {
+    background-color: var(--border);
+    color: var(--subtext);
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* Image Previews */
+.preview-box {
+    width: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 0.5rem;
+    background: #06060c;
+    border-radius: 8px;
     overflow: hidden;
 }
 
 .preview-box img {
-    max-height: 180px;
     max-width: 100%;
+    max-height: 250px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    display: block;
     object-fit: contain;
 }
 
-.clear-preview-btn {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    background: rgba(239, 68, 68, 0.9);
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 26px;
-    height: 26px;
-    cursor: pointer;
-    font-size: 1rem;
-    font-weight: 700;
-    line-height: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    transition: background-color 0.2s ease;
-}
-
-.clear-preview-btn:hover {
-    background: var(--error);
-}
-
-/* ==========================================================================
-   Action Buttons
-   ========================================================================== */
-.action-btn {
-    background-color: var(--accent);
-    color: var(--text-white);
-    border: none;
+/* Status Steps Area */
+.status-container {
+    background: rgba(124, 58, 237, 0.08);
+    border: 1px solid var(--border);
     border-radius: 8px;
-    padding: 0.9rem 1.5rem;
-    font-size: 1rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.1s ease;
-    box-shadow: 0 4px 15px rgba(124, 58, 237, 0.2);
-}
-
-.action-btn:hover:not(:disabled) {
-    background-color: var(--accent-hover);
-    box-shadow: 0 6px 20px rgba(124, 58, 237, 0.35);
-}
-
-.action-btn:active:not(:disabled) {
-    transform: translateY(1px);
-}
-
-.action-btn:disabled {
-    background-color: var(--text-disabled);
-    color: var(--text-muted);
-    box-shadow: none;
-    cursor: not-allowed;
-    opacity: 0.5;
-}
-
-/* ==========================================================================
-   Progress Indicators
-   ========================================================================== */
-.progress-container {
+    padding: 16px;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.step-list {
+    display: flex;
     align-items: center;
-    gap: 0.5rem;
-    background: rgba(15, 15, 26, 0.4);
-    padding: 0.75rem 1rem;
-    border-radius: 8px;
-    border: 1px solid var(--border-color);
-    margin-top: 0.5rem;
+    justify-content: center;
+    gap: 8px;
     flex-wrap: wrap;
+    color: var(--subtext);
+    font-size: 0.88rem;
+    font-weight: 500;
 }
 
-.step-badge {
-    font-size: 0.85rem;
-    font-weight: 600;
-    padding: 0.25rem 0.65rem;
+.step-item {
+    padding: 4px 8px;
     border-radius: 4px;
-    color: var(--text-muted);
-    border: 1px solid transparent;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
 }
 
-.step-badge.active {
-    color: var(--text-white);
-    background-color: rgba(124, 58, 237, 0.2);
-    border-color: var(--accent);
-    box-shadow: 0 0 8px rgba(124, 58, 237, 0.15);
+.step-item.active {
+    color: var(--accent2);
+    font-weight: 700;
+    background: rgba(168, 85, 247, 0.15);
 }
 
-.step-badge.complete {
+.step-item.completed {
     color: var(--success);
-    background-color: rgba(16, 185, 129, 0.1);
-    border-color: var(--success);
+    font-weight: 600;
 }
 
 .step-arrow {
-    color: var(--text-disabled);
-    font-weight: 700;
+    color: var(--border);
 }
 
-/* ==========================================================================
-   Download Container & Buttons
-   ========================================================================== */
-.download-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 1.25rem;
-    background: var(--success-bg);
-    border: 1px solid var(--success-border);
-    border-radius: 10px;
-    animation: fadeIn 0.4s ease forwards;
-}
-
-.success-message {
-    font-weight: 600;
-    color: var(--success);
-    font-size: 0.95rem;
-}
-
+/* Download Button */
 .download-btn {
-    display: inline-block;
+    display: block;
+    text-decoration: none;
+    text-align: center;
     background-color: var(--success);
     color: white;
-    text-decoration: none;
-    font-weight: 700;
-    padding: 0.75rem 1.5rem;
     border-radius: 8px;
-    transition: background-color 0.2s ease, box-shadow 0.2s ease;
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
-    font-size: 0.95rem;
+    padding: 12px 24px;
+    font-weight: 600;
+    transition: background-color 0.2s ease;
 }
 
 .download-btn:hover {
-    background-color: #059669;
-    box-shadow: 0 6px 16px rgba(16, 185, 129, 0.35);
+    background-color: #1eb052;
 }
 
-/* ==========================================================================
-   Decrypted Results Box (Monospace)
-   ========================================================================== */
-.result-container {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    margin-top: 0.5rem;
-    animation: fadeIn 0.4s ease forwards;
-}
-
-.result-container label {
-    font-size: 0.85rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-    color: var(--text-muted);
-}
-
-.monospace-output {
-    font-family: 'JetBrains Mono', Courier, monospace;
+/* Status / Result / Error Boxes */
+.result-box {
+    font-family: 'Courier New', Courier, monospace;
     font-size: 0.95rem;
-    color: var(--success);
-    background: rgba(16, 185, 129, 0.03);
-    border-color: rgba(16, 185, 129, 0.2);
-    min-height: 120px;
+    word-break: break-all;
+    background-color: #0f0f1a;
+    padding: 16px;
+    border-left: 3px solid var(--accent);
+    border-radius: 4px;
+    color: var(--text);
+    white-space: pre-wrap;
+    line-height: 1.5;
 }
 
-.monospace-output:focus {
-    border-color: var(--success);
-    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
-}
-
-.copy-btn {
-    background: transparent;
-    border: 1px solid var(--border-color);
-    color: var(--text-white);
-    border-radius: 8px;
-    padding: 0.65rem 1.25rem;
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 0.9rem;
-    transition: border-color 0.2s ease, background-color 0.2s ease;
-    width: fit-content;
-    align-self: flex-end;
-}
-
-.copy-btn:hover {
-    border-color: var(--accent);
-    background-color: rgba(124, 58, 237, 0.05);
-}
-
-/* ==========================================================================
-   Error/Warning Display
-   ========================================================================== */
 .error-box {
-    background-color: var(--error-bg);
-    border: 1px solid var(--error-border);
+    background-color: #2d1515;
+    border-left: 3px solid var(--error);
     color: var(--error);
+    padding: 16px;
+    border-radius: 4px;
     font-size: 0.9rem;
-    padding: 0.85rem 1.15rem;
-    border-radius: 8px;
-    margin-top: 0.5rem;
     line-height: 1.4;
-    animation: shake 0.35s ease-in-out;
 }
 
-@keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-4px); }
-    75% { transform: translateX(4px); }
-}
-
-/* ==========================================================================
-   Footer
-   ========================================================================== */
-.app-footer {
-    text-align: center;
-    border-top: 1px solid var(--border-color);
-    padding-top: 1.25rem;
-    margin-top: 0.5rem;
-}
-
-.app-footer p {
-    color: var(--text-disabled);
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+.status-text {
+    font-size: 0.9rem;
+    color: var(--accent2);
     font-weight: 600;
 }
 
-/* ==========================================================================
-   Responsive Utilities
-   ========================================================================== */
-@media (max-width: 580px) {
-    .app-card {
-        padding: 1.5rem;
-        gap: 1.25rem;
-    }
-    
-    .app-header h1 {
-        font-size: 1.75rem;
-    }
-    
-    .tab-btn {
-        padding: 0.6rem 0.75rem;
-        font-size: 0.85rem;
-    }
+.stats-paragraph {
+    font-size: 0.95rem;
+    color: var(--text);
+    padding: 10px;
+    background: #0f0f1a;
+    border-radius: 6px;
+    border-left: 3px solid var(--accent);
 }
 
-/* ==========================================================================
-   Steganalysis & Visual Analysis Tab
-   ========================================================================== */
+/* Collapsible cards in Tab 3 */
 .collapsible-card {
-    background: rgba(15, 15, 26, 0.4);
-    border: 1px solid var(--border-color);
-    border-radius: 10px;
-    margin-bottom: 1rem;
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    margin-bottom: 16px;
     overflow: hidden;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-.collapsible-card[open] {
-    border-color: var(--accent);
-    box-shadow: 0 4px 15px rgba(124, 58, 237, 0.08);
 }
 
 .collapsible-card summary {
     list-style: none;
     outline: none;
     cursor: pointer;
-    padding: 1rem 1.25rem;
+    padding: 20px 24px;
     font-weight: 600;
-    font-size: 1.05rem;
+    font-size: 1.1rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
     user-select: none;
-    background: rgba(255, 255, 255, 0.02);
-    transition: background-color 0.2s ease;
 }
 
 .collapsible-card summary::-webkit-details-marker {
@@ -522,63 +353,69 @@ input:disabled, textarea:disabled {
 }
 
 .collapsible-card summary:hover {
-    background: rgba(124, 58, 237, 0.05);
+    background: rgba(255, 255, 255, 0.02);
 }
 
 .collapsible-card .toggle-icon {
     font-size: 0.8rem;
-    color: var(--text-muted);
-    transition: transform 0.3s ease;
+    color: var(--subtext);
+    transition: transform 0.2s ease;
 }
 
 .collapsible-card[open] .toggle-icon {
     transform: rotate(180deg);
 }
 
-.card-content {
-    padding: 1.25rem;
-    border-top: 1px solid var(--border-color);
+.card-body {
+    padding: 0 24px 24px 24px;
     display: flex;
     flex-direction: column;
-    gap: 1.25rem;
-    animation: slideDown 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    gap: 16px;
+    border-top: 1px solid var(--border);
+    padding-top: 16px;
 }
 
-@keyframes slideDown {
-    from { opacity: 0; transform: translateY(-4px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
+/* Two-column responsive layout */
 .form-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 1rem;
+    gap: 16px;
 }
 
-@media (max-width: 580px) {
+/* Canvas output display */
+.canvas-container {
+    width: 100%;
+    margin-top: 8px;
+    display: flex;
+    justify-content: center;
+}
+
+.canvas-container canvas {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background-color: #0f0f1a;
+    display: block;
+}
+
+/* Footer */
+.app-footer {
+    text-align: center;
+    color: var(--subtext);
+    font-size: 0.8rem;
+    margin-top: 40px;
+    border-top: 1px solid var(--border);
+    padding-top: 20px;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 600px) {
     .form-grid {
         grid-template-columns: 1fr;
     }
+    
+    .action-btn, .download-btn {
+        width: 100%;
+    }
 }
-
-.spinner {
-    width: 24px;
-    height: 24px;
-    border: 3px solid rgba(124, 58, 237, 0.15);
-    border-top-color: var(--accent);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
-
-/* Ensure canvas elements fit properly in dark background wrappers */
-#tab-analyze canvas {
-    display: block;
-    max-width: 100%;
-    background-color: #0b0b13;
-    image-rendering: pixelated; /* Keep pixel-level details crisp and unblurred */
-}
-

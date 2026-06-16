@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StegaCrypt - Encrypted Steganography System</title>
+    <title>StegaCrypt - Steganography & Encrypted Data System</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,210 +11,173 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="app-card">
+    <div class="app-container">
         <!-- Header -->
         <header class="app-header">
             <h1>StegaCrypt 🔒</h1>
             <p class="subtitle">Steganography-Based Encrypted Data Transmission System</p>
         </header>
 
-        <!-- Tab Controls -->
+        <!-- Tab Buttons Navigation -->
         <nav class="tab-nav">
-            <button class="tab-btn active" id="tab-btn-hide" data-tab="tab-hide">🔐 Hide Message</button>
-            <button class="tab-btn" id="tab-btn-reveal" data-tab="tab-reveal">🔍 Reveal Message</button>
-            <button class="tab-btn" id="tab-btn-analyze" data-tab="tab-analyze">🔬 Analyze Image</button>
-            <div class="tab-slider"></div>
+            <button class="tab-btn active" id="tabBtnHide" data-tab="tabHide">🔐 Hide Message</button>
+            <button class="tab-btn" id="tabBtnReveal" data-tab="tabReveal">🔍 Reveal Message</button>
+            <button class="tab-btn" id="tabBtnAnalyze" data-tab="tabAnalyze">🔬 Analyze Image</button>
         </nav>
 
-        <!-- Main Workspaces -->
+        <!-- Main Workspace Panels -->
         <main class="app-content">
-            <!-- HIDE MESSAGE TAB -->
-            <section class="tab-panel active" id="tab-hide">
-                <div class="form-group">
-                    <label for="carrier-input">Choose Carrier Image (PNG)</label>
-                    <input type="file" id="carrier-input" accept="image/png">
-                    
-                    <!-- Carrier Image Preview -->
-                    <div class="preview-box" id="carrier-preview-wrapper" style="display: none;">
-                        <img id="carrier-preview" alt="Carrier image preview">
-                        <button class="clear-preview-btn" id="remove-carrier-btn" title="Clear Image">×</button>
+            
+            <!-- TAB 1 — Hide Message -->
+            <section class="tab-panel active" id="tabHide">
+                <div class="card">
+                    <div class="form-group">
+                        <label for="carrierImageInput">Choose Carrier Image (PNG)</label>
+                        <input type="file" id="carrierImageInput" accept="image/png">
+                        
+                        <!-- Image Preview -->
+                        <div class="preview-box">
+                            <img id="carrierPreview" alt="Carrier image preview" style="display: none;">
+                        </div>
                     </div>
-                </div>
 
-                <div class="form-group">
-                    <label for="secret-message">Secret Message</label>
-                    <textarea id="secret-message" placeholder="Type your secret message here..." disabled></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label for="hide-password">Encryption Passphrase</label>
-                    <input type="password" id="hide-password" placeholder="Enter passphrase for encryption" disabled>
-                </div>
-
-                <button class="action-btn" id="btn-hide-process" disabled>Encrypt & Hide Message</button>
-
-                <!-- Progress/Status Area -->
-                <div class="progress-container" id="hide-progress-steps" style="display: none; flex-direction: column; gap: 0.75rem; align-items: center;">
-                    <div id="progress-status-text" style="font-size: 0.9rem; font-weight: 600; color: var(--accent); margin-bottom: 0.25rem; text-align: center;"></div>
-                    <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; flex-wrap: wrap;">
-                        <span class="step-badge" id="step-encrypt">Encrypting...</span>
-                        <span class="step-arrow">→</span>
-                        <span class="step-badge" id="step-embed">Embedding...</span>
-                        <span class="step-arrow">→</span>
-                        <span class="step-badge" id="step-done">Done!</span>
+                    <div class="form-group">
+                        <label for="messageInput">Secret Message</label>
+                        <textarea id="messageInput" placeholder="Type your secret message here..."></textarea>
                     </div>
-                </div>
 
-                <!-- Download Area -->
-                <div class="download-container" id="hide-results" style="display: none;">
-                    <p class="success-message">Payload successfully embedded!</p>
-                    <a id="btn-download-stego" class="download-btn" href="#" download="stego_image.png">Download Stego Image</a>
+                    <div class="form-group">
+                        <label for="hidePassphrase">Encryption Passphrase</label>
+                        <input type="password" id="hidePassphrase" placeholder="Enter passphrase for encryption">
+                    </div>
+
+                    <button class="action-btn" id="hideBtn">Encrypt & Hide Message</button>
+
+                    <!-- Status steps area -->
+                    <div class="status-container" id="hideStatus" style="display: none;">
+                        <div class="step-list">
+                            <span class="step-item" id="step1">Step 1/3: Encrypting...</span>
+                            <span class="step-arrow">→</span>
+                            <span class="step-item" id="step2">Step 2/3: Embedding...</span>
+                            <span class="step-arrow">→</span>
+                            <span class="step-item" id="step3">Step 3/3: Done!</span>
+                        </div>
+                    </div>
+
+                    <!-- Download Button -->
+                    <a id="downloadBtn" class="download-btn" style="display: none;" href="#">⬇ Download Stego Image</a>
+
+                    <!-- Error Box -->
+                    <div class="error-box" id="hideError" style="display: none;"></div>
                 </div>
             </section>
 
-            <!-- REVEAL MESSAGE TAB -->
-            <section class="tab-panel" id="tab-reveal" style="display: none;">
-                <div class="form-group">
-                    <label for="stego-input">Choose Stego Image (PNG)</label>
-                    <input type="file" id="stego-input" accept="image/png">
-                    
-                    <!-- Stego Image Preview -->
-                    <div class="preview-box" id="stego-preview-wrapper" style="display: none;">
-                        <img id="stego-preview" alt="Stego image preview">
-                        <button class="clear-preview-btn" id="remove-stego-btn" title="Clear Image">×</button>
+            <!-- TAB 2 — Reveal Message -->
+            <section class="tab-panel" id="tabReveal" style="display: none;">
+                <div class="card">
+                    <div class="form-group">
+                        <label for="stegoImageInput">Choose Stego Image (PNG)</label>
+                        <input type="file" id="stegoImageInput" accept="image/png">
+                        
+                        <!-- Image Preview -->
+                        <div class="preview-box">
+                            <img id="stegoPreview" alt="Stego image preview" style="display: none;">
+                        </div>
                     </div>
-                </div>
 
-                <div class="form-group">
-                    <label for="reveal-password">Decryption Passphrase</label>
-                    <input type="password" id="reveal-password" placeholder="Enter passphrase for decryption" disabled>
-                </div>
+                    <div class="form-group">
+                        <label for="revealPassphrase">Decryption Passphrase</label>
+                        <input type="password" id="revealPassphrase" placeholder="Enter passphrase for decryption">
+                    </div>
 
-                <button class="action-btn" id="btn-reveal-process" disabled>Extract & Decrypt Message</button>
+                    <button class="action-btn" id="revealBtn">Extract & Decrypt Message</button>
 
-                <!-- Error Box -->
-                <div class="error-box" id="reveal-error-box" style="display: none;"></div>
+                    <!-- Result Box -->
+                    <div class="result-box" id="revealResult" style="display: none;"></div>
 
-                <!-- Result Box -->
-                <div class="result-container" id="reveal-results" style="display: none;">
-                    <label for="decrypted-message">Revealed Message</label>
-                    <textarea id="decrypted-message" class="monospace-output" readonly></textarea>
-                    <button class="copy-btn" id="btn-copy-message">Copy Message</button>
+                    <!-- Error Box -->
+                    <div class="error-box" id="revealError" style="display: none;"></div>
                 </div>
             </section>
 
-            <!-- ANALYZE IMAGE TAB -->
-            <section class="tab-panel" id="tab-analyze" style="display: none;">
-                <!-- Loading Overlay/Spinner -->
-                <div class="progress-container" id="analyze-loading" style="display: none; flex-direction: column; gap: 0.75rem; align-items: center; margin-bottom: 1rem; width: 100%;">
-                    <div style="display: flex; align-items: center; gap: 0.75rem;">
-                        <div class="spinner"></div>
-                        <span id="analyze-loading-text" style="font-size: 0.95rem; font-weight: 600; color: var(--accent);">Processing image...</span>
-                    </div>
-                </div>
-
-                <!-- CARD 1: Capacity Calculator -->
-                <details class="collapsible-card" open>
+            <!-- TAB 3 — Analyze Image -->
+            <section class="tab-panel" id="tabAnalyze" style="display: none;">
+                
+                <!-- CARD 1 — Capacity Calculator -->
+                <details class="collapsible-card" id="cardCapacity" open>
                     <summary>
                         <span>📐 Capacity Calculator</span>
                         <span class="toggle-icon">▼</span>
                     </summary>
-                    <div class="card-content">
+                    <div class="card-body">
                         <div class="form-group">
-                            <label for="analyze-capacity-input">Upload any PNG image</label>
-                            <input type="file" id="analyze-capacity-input" accept="image/png">
+                            <label for="capacityInput">Upload carrier PNG image</label>
+                            <input type="file" id="capacityInput" accept="image/png">
                         </div>
-                        <button class="action-btn" id="btn-analyze-capacity" disabled>Calculate Capacity</button>
-                        <div class="result-container" id="analyze-capacity-result" style="display: none; width: 100%;">
-                            <div class="stats-box" style="padding: 1rem; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-color); border-radius: 8px; width: 100%;">
-                                <p style="font-size: 0.95rem; line-height: 1.6; color: var(--text-white);" id="analyze-capacity-text"></p>
-                            </div>
-                        </div>
+                        <button class="action-btn" id="capacityBtn">Calculate Capacity</button>
+                        <div class="result-box" id="capacityResult" style="display: none;"></div>
                     </div>
                 </details>
 
-                <!-- CARD 2: LSB Plane Visualizer -->
-                <details class="collapsible-card">
+                <!-- CARD 2 — LSB Plane Visualizer -->
+                <details class="collapsible-card" id="cardLsb">
                     <summary>
                         <span>🔬 LSB Plane Visualizer</span>
                         <span class="toggle-icon">▼</span>
                     </summary>
-                    <div class="card-content">
+                    <div class="card-body">
                         <div class="form-group">
-                            <label for="analyze-lsb-input">Upload a PNG image (original or stego)</label>
-                            <input type="file" id="analyze-lsb-input" accept="image/png">
+                            <label for="lsbInput">Upload PNG image</label>
+                            <input type="file" id="lsbInput" accept="image/png">
                         </div>
-                        <button class="action-btn" id="btn-analyze-lsb" disabled>Visualize LSB Plane</button>
-                        <div class="result-container" id="analyze-lsb-result" style="display: none; flex-direction: column; align-items: center; width: 100%;">
-                            <div style="width: 100%; border: 1px solid var(--border-color); border-radius: 8px; padding: 0.5rem; background: #0b0b13; overflow: hidden; display: flex; justify-content: center; align-items: center;">
-                                <canvas id="analyze-lsb-canvas" style="max-width: 100%; max-height: 350px; height: auto; object-fit: contain;"></canvas>
-                            </div>
-                            <div style="font-size: 0.85rem; font-weight: 600; text-transform: uppercase; color: var(--text-muted); margin-top: 0.5rem; text-align: center;">
-                                LSB Plane — structured region = hidden data present
-                            </div>
-                            <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; text-align: left; margin-top: 0.5rem; width: 100%;">
-                                This visualization highlights the least significant bits of the image. Structured, non-random patterns (like horizontal bands or text-like blocks) near the top-left indicate the presence of hidden steganographic data.
-                            </p>
-                        </div>
+                        <button class="action-btn" id="lsbBtn">Visualize LSB Plane</button>
+                        <div class="status-text" id="lsbStatus" style="display: none;"></div>
+                        <div class="canvas-container" id="lsbCanvasContainer"></div>
                     </div>
                 </details>
 
-                <!-- CARD 3: Pixel Difference Heatmap -->
-                <details class="collapsible-card">
+                <!-- CARD 3 — Pixel Difference Heatmap -->
+                <details class="collapsible-card" id="cardHeatmap">
                     <summary>
                         <span>🌡️ Pixel Difference Heatmap</span>
                         <span class="toggle-icon">▼</span>
                     </summary>
-                    <div class="card-content">
+                    <div class="card-body">
                         <div class="form-grid">
                             <div class="form-group">
-                                <label for="analyze-diff-orig-input">Upload Original Image</label>
-                                <input type="file" id="analyze-diff-orig-input" accept="image/png">
+                                <label for="heatmapOriginalInput">Upload Original Image</label>
+                                <input type="file" id="heatmapOriginalInput" accept="image/png">
                             </div>
                             <div class="form-group">
-                                <label for="analyze-diff-stego-input">Upload Stego Image</label>
-                                <input type="file" id="analyze-diff-stego-input" accept="image/png">
+                                <label for="heatmapStegoInput">Upload Stego Image</label>
+                                <input type="file" id="heatmapStegoInput" accept="image/png">
                             </div>
                         </div>
-                        <button class="action-btn" id="btn-analyze-diff" disabled>Generate Heatmap</button>
-                        <div class="result-container" id="analyze-diff-result" style="display: none; flex-direction: column; align-items: center; width: 100%;">
-                            <div style="width: 100%; border: 1px solid var(--border-color); border-radius: 8px; padding: 0.5rem; background: #0b0b13; overflow: hidden; display: flex; justify-content: center; align-items: center;">
-                                <canvas id="analyze-diff-canvas" style="max-width: 100%; max-height: 350px; height: auto; object-fit: contain;"></canvas>
-                            </div>
-                            <div class="stats-box" style="width: 100%; padding: 1rem; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-color); border-radius: 8px; text-align: left;">
-                                <p style="font-size: 0.95rem; font-weight: 600; color: var(--accent); margin-bottom: 0.5rem;" id="analyze-diff-stats"></p>
-                                <p style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.5;">
-                                    <strong>Note:</strong> Red pixels = bits modified by LSB steganography. The change is invisible to the human eye but detectable by pixel comparison.
-                                </p>
-                            </div>
-                        </div>
+                        <button class="action-btn" id="generateHeatmapBtn">Generate Heatmap</button>
+                        <div class="status-text" id="heatmapStatus" style="display: none;"></div>
+                        <div class="stats-paragraph" id="heatmapStats" style="display: none;"></div>
+                        <div class="canvas-container" id="heatmapCanvasContainer"></div>
+                        <div class="error-box" id="heatmapError" style="display: none;"></div>
                     </div>
                 </details>
 
-                <!-- CARD 4: Histogram Analysis -->
-                <details class="collapsible-card">
+                <!-- CARD 4 — Histogram Analysis -->
+                <details class="collapsible-card" id="cardHistogram">
                     <summary>
                         <span>📊 Histogram Analysis</span>
                         <span class="toggle-icon">▼</span>
                     </summary>
-                    <div class="card-content">
+                    <div class="card-body">
                         <div class="form-group">
-                            <label for="analyze-hist-input">Upload a PNG image</label>
-                            <input type="file" id="analyze-hist-input" accept="image/png">
+                            <label for="histogramInput">Upload PNG image</label>
+                            <input type="file" id="histogramInput" accept="image/png">
                         </div>
-                        <button class="action-btn" id="btn-analyze-hist" disabled>Analyze Histogram</button>
-                        <div class="result-container" id="analyze-hist-result" style="display: none; flex-direction: column; align-items: center; width: 100%;">
-                            <div style="width: 100%; border: 1px solid var(--border-color); border-radius: 8px; padding: 0.5rem; background: #0b0b13; overflow: hidden; display: flex; justify-content: center; align-items: center;">
-                                <canvas id="analyze-hist-canvas" width="600" height="300" style="max-width: 100%; height: auto; object-fit: contain;"></canvas>
-                            </div>
-                            <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; text-align: left; margin-top: 0.5rem; width: 100%;">
-                                LSB steganography shifts even-valued pixels to odd and vice versa. 
-                                In a stego image, histogram bars at adjacent even/odd values become 
-                                more equal in height — this is the statistical fingerprint of LSB embedding.
-                            </p>
-                        </div>
+                        <button class="action-btn" id="histogramBtn">Analyze Histogram</button>
+                        <div class="status-text" id="histogramStatus" style="display: none;"></div>
+                        <div class="canvas-container" id="histogramCanvasContainer"></div>
                     </div>
                 </details>
+
             </section>
         </main>
 
@@ -224,7 +187,8 @@
         </footer>
     </div>
 
-    <!-- Main Controller module -->
+    <!-- Main ES Modules Controller -->
     <script type="module" src="app.js"></script>
+    <script type="module" src="test.js"></script>
 </body>
 </html>

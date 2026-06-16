@@ -5,24 +5,13 @@
  * It hides an encrypted payload string inside the pixel color data of a carrier image.
  */
 
-/**
- * Helper: Loads a JavaScript File object (Image) and returns an HTMLImageElement.
- * @param {File} file - The file uploaded by the user.
- * @returns {Promise<HTMLImageElement>} - Resolved when the image is fully loaded.
- */
-function loadImage(file) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-            const img = new Image();
-            img.onload = () => resolve(img);
-            img.onerror = () => reject(new Error("Failed to parse image file."));
-            img.src = event.target.result;
-        };
-        reader.onerror = () => reject(new Error("Failed to read image file."));
-        reader.readAsDataURL(file);
-    });
-}
+const loadImage = (file) => new Promise((resolve, reject) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => { URL.revokeObjectURL(url); resolve(img); };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("Failed to load image")); };
+    img.src = url; // src MUST be set AFTER onload is defined
+});
 
 /**
  * Calculates the maximum storage capacity of an image in bytes.

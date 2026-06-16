@@ -212,6 +212,6 @@ export async function decryptMessage(encryptedPayload, passphrase) {
         // Wrap any failure in a user-friendly error message.
         // In cryptography, we avoid specifying whether the password was wrong
         // or the data was corrupted to prevent side-channel timing attacks.
-        throw new Error("Decryption failed. Please verify the password and check that the stego-image is not corrupted.");
+        throw new Error("Decryption failed: wrong passphrase or corrupted data.");
     }
 }

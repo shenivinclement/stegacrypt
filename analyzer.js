@@ -10,22 +10,23 @@
 
 /**
  * Helper: Loads a File object (Image) and returns an HTMLImageElement.
+ * This helper uses the safe URL.createObjectURL pattern to avoid race conditions.
  * @param {File} file - The file uploaded by the user.
  * @returns {Promise<HTMLImageElement>} - Resolved when the image is fully loaded.
  */
-function loadImage(file) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-            const img = new Image();
-            img.onload = () => resolve(img);
-            img.onerror = () => reject(new Error("Failed to parse image file."));
-            img.src = event.target.result;
-        };
-        reader.onerror = () => reject(new Error("Failed to read image file."));
-        reader.readAsDataURL(file);
-    });
-}
+const loadImage = (file) => new Promise((resolve, reject) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+        URL.revokeObjectURL(url);
+        resolve(img);
+    };
+    img.onerror = () => {
+        URL.revokeObjectURL(url);
+        reject(new Error("Failed to load image."));
+    };
+    img.src = url; // src MUST be set AFTER onload is defined
+});
 
 /**
  * TOOL 1: Calculates the steganography capacity of a PNG file.
@@ -55,31 +56,27 @@ export async function imageCapacityCalculator(imageFile) {
 
 /**
  * TOOL 2: Visualizes the LSB plane of the input image.
+ * Extracts the LSB of Red, Green, and Blue channels and scales them to 255 (full brightness).
  * @param {File} imageFile - The PNG file to visualize.
- * @param {HTMLCanvasElement} visibleCanvas - The canvas where the visualized LSB output will be written.
- * @returns {Promise<void>}
+ * @returns {Promise<HTMLCanvasElement>} - Resolved with the output canvas element.
  */
-export async function lsbPlaneVisualizer(imageFile, visibleCanvas) {
+export async function lsbPlaneVisualizer(imageFile) {
     const img = await loadImage(imageFile);
     const width = img.naturalWidth || img.width;
     const height = img.naturalHeight || img.height;
     
-    // Set visible canvas dimensions
-    visibleCanvas.width = width;
-    visibleCanvas.height = height;
-    const visibleCtx = visibleCanvas.getContext('2d');
+    // Create new offscreen canvas for the output
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d');
     
-    // Offscreen canvas to read original RGBA pixel data
-    const offscreenCanvas = document.createElement('canvas');
-    offscreenCanvas.width = width;
-    offscreenCanvas.height = height;
-    const offscreenCtx = offscreenCanvas.getContext('2d');
-    offscreenCtx.drawImage(img, 0, 0);
-    
-    const imageData = offscreenCtx.getImageData(0, 0, width, height);
+    // Draw original image to read its RGBA pixel data
+    ctx.drawImage(img, 0, 0);
+    const imageData = ctx.getImageData(0, 0, width, height);
     const data = imageData.data;
     
-    // For each pixel, scale LSB to 255 (0 -> black, 1 -> white)
+    // Process each pixel: isolate LSB of R, G, B channels and map to 0 or 255
     for (let i = 0; i < data.length; i += 4) {
         const rLsb = data[i] & 1;
         const gLsb = data[i + 1] & 1;
@@ -91,18 +88,26 @@ export async function lsbPlaneVisualizer(imageFile, visibleCanvas) {
         data[i + 3] = 255;        // Alpha (full opacity)
     }
     
-    // Write new pixel data to visible canvas
-    visibleCtx.putImageData(imageData, 0, 0);
+    // Write processed pixels back to the output canvas
+    ctx.putImageData(imageData, 0, 0);
+    return canvas;
 }
 
 /**
  * TOOL 3: Computes pixel-by-pixel color differences and renders a heatmap.
  * @param {File} originalFile - The original carrier PNG file.
  * @param {File} stegoFile - The stego PNG file.
- * @param {HTMLCanvasElement} visibleCanvas - The target UI canvas for the heatmap.
- * @returns {Promise<Object>} - Stats: { modifiedPixels, totalPixels, percentage }
+ * @returns {Promise<Object>} - Stats and output canvas: { canvas, modifiedPixels, totalPixels, percentage }
  */
-export async function pixelDifferenceHeatmap(originalFile, stegoFile, visibleCanvas) {
+export async function pixelDifferenceHeatmap(originalFile, stegoFile) {
+    // Check if both files are identical (same name + size + lastModified)
+    if (originalFile.name === stegoFile.name &&
+        originalFile.size === stegoFile.size &&
+        originalFile.lastModified === stegoFile.lastModified) {
+        throw new Error("Both files are the same. Upload original on left, stego image on right.");
+    }
+
+    // Load both images asynchronously
     const [origImg, stegoImg] = await Promise.all([
         loadImage(originalFile),
         loadImage(stegoFile)
@@ -114,15 +119,18 @@ export async function pixelDifferenceHeatmap(originalFile, stegoFile, visibleCan
     const stegoWidth = stegoImg.naturalWidth || stegoImg.width;
     const stegoHeight = stegoImg.naturalHeight || stegoImg.height;
     
+    // Validate dimensions match
     if (width !== stegoWidth || height !== stegoHeight) {
-        throw new Error("Original and stego images must have identical dimensions.");
+        throw new Error("Image dimensions don't match. Use the original and its stego version.");
     }
     
-    visibleCanvas.width = width;
-    visibleCanvas.height = height;
-    const visibleCtx = visibleCanvas.getContext('2d');
+    // Create output canvas
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d');
     
-    // Read original pixel data
+    // Read original pixel data using offscreen canvas
     const origCanvas = document.createElement('canvas');
     origCanvas.width = width;
     origCanvas.height = height;
@@ -130,7 +138,7 @@ export async function pixelDifferenceHeatmap(originalFile, stegoFile, visibleCan
     origCtx.drawImage(origImg, 0, 0);
     const origData = origCtx.getImageData(0, 0, width, height).data;
     
-    // Read stego pixel data
+    // Read stego pixel data using offscreen canvas
     const stegoCanvas = document.createElement('canvas');
     stegoCanvas.width = width;
     stegoCanvas.height = height;
@@ -138,7 +146,7 @@ export async function pixelDifferenceHeatmap(originalFile, stegoFile, visibleCan
     stegoCtx.drawImage(stegoImg, 0, 0);
     const stegoData = stegoCtx.getImageData(0, 0, width, height).data;
     
-    const outputImageData = visibleCtx.createImageData(width, height);
+    const outputImageData = ctx.createImageData(width, height);
     const outData = outputImageData.data;
     
     let modifiedPixels = 0;
@@ -154,6 +162,7 @@ export async function pixelDifferenceHeatmap(originalFile, stegoFile, visibleCan
         const stegoG = stegoData[i + 1];
         const stegoB = stegoData[i + 2];
         
+        // Compute brightness difference
         const delta = Math.abs(origR - stegoR) + Math.abs(origG - stegoG) + Math.abs(origB - stegoB);
         
         if (delta > 0) {
@@ -164,7 +173,7 @@ export async function pixelDifferenceHeatmap(originalFile, stegoFile, visibleCan
             outData[i + 3] = 255;
             modifiedPixels++;
         } else {
-            // Unchanged pixel: keep original color dimmed at 30% opacity
+            // Unchanged pixel: keep original color dimmed at 30% brightness
             outData[i] = origR;
             outData[i + 1] = origG;
             outData[i + 2] = origB;
@@ -172,10 +181,11 @@ export async function pixelDifferenceHeatmap(originalFile, stegoFile, visibleCan
         }
     }
     
-    visibleCtx.putImageData(outputImageData, 0, 0);
+    ctx.putImageData(outputImageData, 0, 0);
     
     const percentage = ((modifiedPixels / totalPixels) * 100).toFixed(4);
     return {
+        canvas,
         modifiedPixels,
         totalPixels,
         percentage
@@ -185,15 +195,14 @@ export async function pixelDifferenceHeatmap(originalFile, stegoFile, visibleCan
 /**
  * TOOL 4: Builds a brightness histogram and draws a bar chart to canvas.
  * @param {File} imageFile - The PNG file to analyze.
- * @param {HTMLCanvasElement} targetCanvas - The canvas where the histogram chart will be drawn.
- * @returns {Promise<void>}
+ * @returns {Promise<HTMLCanvasElement>} - Resolved with the output canvas element.
  */
-export async function histogramAnalysis(imageFile, targetCanvas) {
+export async function histogramAnalysis(imageFile) {
     const img = await loadImage(imageFile);
     const width = img.naturalWidth || img.width;
     const height = img.naturalHeight || img.height;
     
-    // Read pixel data
+    // Read pixel data using offscreen canvas
     const canvas = document.createElement('canvas');
     canvas.width = width;
     canvas.height = height;
@@ -214,14 +223,17 @@ export async function histogramAnalysis(imageFile, targetCanvas) {
         histogram[brightness]++;
     }
     
-    // Render the histogram bar chart
-    // Determine canvas visual size
-    const canvasWidth = targetCanvas.width;
-    const canvasHeight = targetCanvas.height;
+    // Create new target canvas for the bar chart
+    const targetCanvas = document.createElement('canvas');
+    targetCanvas.width = 600;
+    targetCanvas.height = 300;
     const renderCtx = targetCanvas.getContext('2d');
     
+    const canvasWidth = targetCanvas.width;
+    const canvasHeight = targetCanvas.height;
+    
     // Colors and margins
-    const paddingLeft = 55;
+    const paddingLeft = 65;
     const paddingRight = 20;
     const paddingTop = 25;
     const paddingBottom = 45;
@@ -230,7 +242,7 @@ export async function histogramAnalysis(imageFile, targetCanvas) {
     const chartHeight = canvasHeight - paddingTop - paddingBottom;
     
     // Clear canvas and draw background
-    renderCtx.fillStyle = '#0b0b13';
+    renderCtx.fillStyle = '#0f0f1a';
     renderCtx.fillRect(0, 0, canvasWidth, canvasHeight);
     
     // Find maximum bin count for scaling Y axis
@@ -247,8 +259,8 @@ export async function histogramAnalysis(imageFile, targetCanvas) {
         renderCtx.stroke();
         
         // Y-axis label text
-        renderCtx.fillStyle = '#94a3b8';
-        renderCtx.font = '9px Outfit, sans-serif';
+        renderCtx.fillStyle = '#9ca3af';
+        renderCtx.font = '10px "Segoe UI", sans-serif';
         renderCtx.textAlign = 'right';
         renderCtx.textBaseline = 'middle';
         const val = Math.round(maxCount * (i / 4));
@@ -266,7 +278,7 @@ export async function histogramAnalysis(imageFile, targetCanvas) {
         const y = paddingTop + chartHeight - barHeight;
         
         // Bar coloring rule:
-        // values 0-85 in blue, 86-170 in green, 171-255 in red.
+        // 0-85 = blue, 86-170 = green, 171-255 = red.
         if (i <= 85) {
             renderCtx.fillStyle = '#3b82f6'; // Blue
         } else if (i <= 170) {
@@ -290,8 +302,8 @@ export async function histogramAnalysis(imageFile, targetCanvas) {
     
     // Draw X-axis ticks and labels at specific points (0, 64, 128, 192, 255)
     const xTicks = [0, 64, 128, 192, 255];
-    renderCtx.fillStyle = '#94a3b8';
-    renderCtx.font = '10px Outfit, sans-serif';
+    renderCtx.fillStyle = '#9ca3af';
+    renderCtx.font = '10px "Segoe UI", sans-serif';
     renderCtx.textAlign = 'center';
     renderCtx.textBaseline = 'top';
     renderCtx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
@@ -311,15 +323,17 @@ export async function histogramAnalysis(imageFile, targetCanvas) {
     });
     
     // Draw labels for axes
-    renderCtx.fillStyle = '#ffffff';
-    renderCtx.font = '11px Outfit, sans-serif';
+    renderCtx.fillStyle = '#f1f1f1';
+    renderCtx.font = '11px "Segoe UI", sans-serif';
     renderCtx.textAlign = 'center';
     renderCtx.fillText('Pixel Brightness Value (0–255)', paddingLeft + chartWidth / 2, paddingTop + chartHeight + 25);
     
     renderCtx.save();
-    renderCtx.translate(15, paddingTop + chartHeight / 2);
+    renderCtx.translate(18, paddingTop + chartHeight / 2);
     renderCtx.rotate(-Math.PI / 2);
     renderCtx.textAlign = 'center';
     renderCtx.fillText('Pixel Count', 0, 0);
     renderCtx.restore();
+
+    return targetCanvas;
 }
