@@ -134,7 +134,7 @@ hideBtn.addEventListener('click', async () => {
         step2.classList.add('active');
         step2.textContent = "Step 2/3: Embedding ciphertext into image pixels (LSB)...";
         await new Promise(r => setTimeout(r, 400));
-        const stegoBlob = await hideDataInImage(file, encryptedPayload);
+        const blob = await hideDataInImage(file, encryptedPayload);
         step2.classList.remove('active');
         step2.classList.add('completed');
         step2.textContent = "Step 2/3: Embedded ✔";
@@ -143,11 +143,11 @@ hideBtn.addEventListener('click', async () => {
         step3.classList.add('active', 'completed');
         step3.textContent = "Step 3/3: Complete! Download your stego image below.";
 
-        // 7. Create Object URL, set as download link href
-        const downloadUrl = URL.createObjectURL(stegoBlob);
-        downloadBtn.href = downloadUrl;
-        downloadBtn.download = "stegacrypt_output.png";
-        downloadBtn.style.display = 'block';
+        const url = URL.createObjectURL(blob);
+        const downloadBtn = document.getElementById('downloadBtn');
+        downloadBtn.href = url;
+        downloadBtn.download = 'stegacrypt_output.png';
+        downloadBtn.style.display = 'inline-block';
     } catch (err) {
         // 9. Show error on failure
         showHideError(err.message || "An unexpected error occurred during encoding.");

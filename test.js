@@ -174,7 +174,7 @@ async function runAllTests() {
 
 // Run tests automatically if "?runTests=true" is in query parameters
 if (window.location.search.includes('runTests=true')) {
-    window.addEventListener('DOMContentLoaded', () => {
+    const startTests = () => {
         // Create UI container dynamically if not exists
         let uiContainer = document.getElementById('testResultUI');
         if (!uiContainer) {
@@ -184,5 +184,91 @@ if (window.location.search.includes('runTests=true')) {
             document.querySelector('.app-container').appendChild(uiContainer);
         }
         runAllTests();
-    });
+    };
+
+    if (document.readyState === 'loading') {
+        window.addEventListener('DOMContentLoaded', startTests);
+    } else {
+        startTests();
+    }
+}
+
+// Workflow UI Automation for headless testing
+if (window.location.search.includes('workflow=true')) {
+    const runWorkflow = async () => {
+        console.log("Starting workflow UI automation...");
+        try {
+            // 1. Fetch carrier_sample.png
+            const response = await fetch('/carrier_sample.png');
+            const carrierBlob = await response.blob();
+            const carrierFile = new File([carrierBlob], "carrier_sample.png", { type: "image/png" });
+
+            // 2. Set secret message and passphrase
+            document.getElementById('messageInput').value = "Test secret message!";
+            document.getElementById('hidePassphrase').value = "testpass123";
+
+            // 3. Populate carrier image file input
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(carrierFile);
+            document.getElementById('carrierImageInput').files = dataTransfer.files;
+            document.getElementById('carrierImageInput').dispatchEvent(new Event('change', { bubbles: true }));
+
+            // Wait a moment for UI to register
+            await new Promise(r => setTimeout(r, 500));
+
+            // 4. Click hideBtn
+            console.log("Clicking Hide Button");
+            document.getElementById('hideBtn').click();
+
+            // 5. Wait for downloadBtn to become visible
+            let downloadBtn = document.getElementById('downloadBtn');
+            while (downloadBtn.style.display !== 'inline-block' && downloadBtn.style.display !== 'block') {
+                await new Promise(r => setTimeout(r, 200));
+            }
+            console.log("Download button is visible!");
+
+            // 6. Get the generated stego blob by fetching the download link URL
+            const stegoUrl = downloadBtn.href;
+            const stegoResponse = await fetch(stegoUrl);
+            const stegoBlob = await stegoResponse.blob();
+            const stegoFile = new File([stegoBlob], "stegacrypt_output.png", { type: "image/png" });
+
+            // 7. Go to Analyze Image tab
+            document.getElementById('tabBtnAnalyze').click();
+
+            // 8. Open Heatmap card
+            const cardHeatmap = document.getElementById('cardHeatmap');
+            if (!cardHeatmap.hasAttribute('open')) {
+                cardHeatmap.setAttribute('open', '');
+            }
+
+            // 9. Populate Heatmap inputs
+            const dtOriginal = new DataTransfer();
+            dtOriginal.items.add(carrierFile);
+            document.getElementById('heatmapOriginalInput').files = dtOriginal.files;
+            document.getElementById('heatmapOriginalInput').dispatchEvent(new Event('change', { bubbles: true }));
+
+            const dtStego = new DataTransfer();
+            dtStego.items.add(stegoFile);
+            document.getElementById('heatmapStegoInput').files = dtStego.files;
+            document.getElementById('heatmapStegoInput').dispatchEvent(new Event('change', { bubbles: true }));
+
+            // Wait a moment
+            await new Promise(r => setTimeout(r, 500));
+
+            // 10. Click Generate Heatmap button
+            console.log("Clicking Generate Heatmap Button");
+            document.getElementById('generateHeatmapBtn').click();
+
+            console.log("Workflow automation completed successfully!");
+        } catch (err) {
+            console.error("Workflow automation error:", err);
+        }
+    };
+
+    if (document.readyState === 'loading') {
+        window.addEventListener('DOMContentLoaded', runWorkflow);
+    } else {
+        runWorkflow();
+    }
 }

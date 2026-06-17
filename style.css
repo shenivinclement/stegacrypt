@@ -271,20 +271,20 @@ input[type="password"]:focus, textarea:focus, input[type="file"]:focus {
 }
 
 /* Download Button */
-.download-btn {
-    display: block;
-    text-decoration: none;
-    text-align: center;
-    background-color: var(--success);
-    color: white;
-    border-radius: 8px;
-    padding: 12px 24px;
-    font-weight: 600;
-    transition: background-color 0.2s ease;
+#downloadBtn {
+  display: inline-block;
+  background: var(--accent);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  margin-top: 12px;
+  cursor: pointer;
 }
-
-.download-btn:hover {
-    background-color: #1eb052;
+#downloadBtn:hover {
+  background: var(--accent2);
+  transform: translateY(-1px);
 }
 
 /* Status / Result / Error Boxes */
